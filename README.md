@@ -39,8 +39,11 @@ pwsh -File fix-foreground-lock.ps1 -Undo      # 改回 Windows 預設 200000 並
 
 ## 驗證
 
-1. `-Status` 顯示即時值為 0。
-2. 用工具量 paged pool 的 `Toke` 標籤(例如 PoolMon,或以 `NtQuerySystemInformation(SystemPoolTagInformation)` 讀取),大量開子程式前後比較;修好後應接近不變。
+1. `pwsh -File fix-foreground-lock.ps1 -Status` 顯示即時值為 0。
+2. `pwsh -File measure-token-leak.ps1` 看目前 `Toke` 用量與 paged pool 前幾名。
+3. `pwsh -File measure-token-leak.ps1 -Test 500` 開 1000 個子程式比較前後 `Toke`;修好後每個應接近 0 KB(背景程式會造成少量雜訊),沒修約每個 1–5 KB。
+
+`measure-token-leak.ps1` 唯讀,只讀核心 pool 標籤統計,一般權限即可。
 
 ## 參考
 
